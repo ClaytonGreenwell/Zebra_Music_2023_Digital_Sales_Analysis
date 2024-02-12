@@ -1,0 +1,138 @@
+---
+title: "Zebra Music (Korea) 2023 Digital Sales Analysis"
+author: "Clayton Greenwell"
+date: "2024-02-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Background
+
+*Please note that Zebra Music and its 5 local DSPs are* **fictional** *companies.* 
+
+In this project, let’s imagine that we own a catalog of digital music. We’re partnering with a Korean company (Zebra) to distribute that music in South Korea, and we’re analyzing a year’s worth of sales statements from Zebra Music to find insights.
+
+Zebra Music is a digital partner that delivers repertoire and pitch to 5 local Digital Service Providers (DSPs) in South Korea: *BeatFlow, Kgroove, TEMPO, Echo,* and *Pulse.* These 5 local DSPs make up about 60% of digital music revenue in Korea. Giants like YouTube and Apple have struggled in this market, with Spotify only launching locally in February 2021 (but with no free tier). For perspective, Korea is the world’s 6th largest music market and continues to grow.
+
+We've combined 12 monthly statements of digital sales reporting to analyze and compare Zebra’s 5 local DSPs, looking for trends and insights. All currency amounts shown are in USD.
+
+## 2. Preparing The Data
+
+First let’s install packages and ingest our CSV file.
+
+```{r prep1, message=FALSE}
+install.packages("tidyverse")
+
+library(tidyverse)
+
+install.packages("zoo")
+
+library(zoo)
+
+read_csv("combined_data4.csv") -> combined_data
+```
+Now we’ll fix the *Date* column.
+
+```{r prep2}
+combined_data$`Date` <- as.yearmon(combined_data$`Date`, "%Y.%m")
+```
+
+## 3. Analysis
+
+This year, several foreign partner accounts were audited by the accounting department in a randomized sample to pinpoint any that were withholding tax. Zebra was not an account chosen in that randomized sample. Tax withheld from sales payments can usually be reclaimed later by filing tax paperwork, so this is very important information.
+
+Let’s get a total of tax withheld.
+
+```{r analysis1}
+total_withholding <- combined_data %>%
+  summarise(total = sum(`Tax`))
+
+print(total_withholding)
+```
+
+The total withheld for 2023 was **$10,995 USD**. That’s a lot of money, and a great insight retrieved from our data.
+
+Let’s see how much our company earned in total from Zebra in 2023.
+
+```{r analysis2}
+total_sales <- combined_data %>%
+  summarise(total = sum(`Sales`))
+
+print(total_sales)
+```
+
+The total earned for our company in 2023 was **$88,957 USD**.
+
+Now let’s get the total number of all streams for 2023.
+
+```{r analysis3}
+total_streams <- combined_data %>%
+  summarise(total = sum(`Streams`))
+
+print(total_streams)
+```
+
+The complete total of streams reported by Zebra was **30.9 million**.
+
+Let’s look at one DSP in particular, Echo. Let’s see how many downloads Echo reported in 2023.
+
+```{r analysis4}
+Echo_downloads <- sum(combined_data[combined_data$DSP == "Echo",]$Downloads)
+
+print(Echo_downloads)
+```
+
+Echo reported no downloads for the entirety of 2023.
+
+Using dollars earned as our basis, let’s look at these 5 DSPs and see each one’s percentage of localized market share.
+
+```{r analysis5}
+perc_of_localized_marketshare <- combined_data %>%
+  group_by(DSP) %>%
+  summarise(percentage = sum(`Sales`) / sum(combined_data$`Sales`) * 100)
+
+print(perc_of_localized_marketshare)
+```
+
+As you can see, that’s
+
+**TEMPO 7%**
+
+**Echo 14%**
+
+**Kgroove 33%**
+
+**BeatFlow 37%**
+
+**Pulse 10%**
+
+Kgroove and BeatFlow total to 70% of the localized Korean digital revenue market share. Let’s remember this, because that’s the lion’s share of our business with Zebra.
+
+## 4. Visualizations
+
+Click this link to view an interactive dashboard in Looker Studio:
+<https://lookerstudio.google.com/embed/reporting/5a55636a-c5e3-4c0e-b45f-2f4928c73b6b/page/ighZD>
+
+
+Here is an additional visualization that didn’t fit on the dashboard:
+
+```{r viz1}
+ggplot(combined_data, aes(x = DSP, y = Sales)) +
+  geom_bar(stat = "identity") +
+  xlab("Digital Service Provider (DSP)") +
+  ylab("Sales (USD)") +
+  ggtitle("Zebra 2023 Digital Sales by DSP")
+```
+
+## 5. Takeaways
+
+1. Our most important takeaway is that **$10,049 USD** was withheld by Zebra in 2023 for tax purposes. That is unexpected, and we can follow up with the accounting department to see if we can reclaim this money.
+
+2. Kgroove’s market share is much higher than we had recorded internally. Our records indicated that Kgroove held 19% of the localized market, but in actuality they held **33%** in 2023. That points toward Kgroove being a growing DSP, and a significant partner for our interests.
+
+3. Month-to-month profits declined sharply across the localized market from January to December of 2023. Without seeing more data from other years to compare, we can’t make any predictions as to whether this is an expected yearly cycle or if others in the market (like Spotify) are making gains and drawing away customers.
+
+4. Echo reported no digital downloads at all in 2023. I looked at their website and wasn’t able to find functionality for downloads, but it might be worth confirming with Zebra whether or not Echo offers this service.
