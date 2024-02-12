@@ -129,7 +129,7 @@ ggplot(combined_data, aes(x = DSP, y = Sales)) +
 
 ## 5. Takeaways
 
-1. Our most important takeaway is that **$10,049 USD** was withheld by Zebra in 2023 for tax purposes. That is unexpected, and we can follow up with the accounting department to see if we can reclaim this money.
+1. Our most important takeaway is that **$10,995 USD** was withheld by Zebra in 2023 for tax purposes. That is unexpected, and we can follow up with the accounting department to see if we can reclaim this money.
 
 2. Kgroove’s market share is much higher than we had recorded internally. Our records indicated that Kgroove held 19% of the localized market, but in actuality they held **33%** in 2023. That points toward Kgroove being a growing DSP, and a significant partner for our interests.
 
